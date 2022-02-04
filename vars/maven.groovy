@@ -41,7 +41,7 @@ void runCd(String[] stagesToRun) {
         stage(downloadNexus) {
             CURRENT_STAGE = downloadNexus
             figlet CURRENT_STAGE
-            withCredentials([usernameColonPassword(credentialsId: 'nexus3-docker-user', variable: 'NEXUS_CREDENTIALS')]) {
+            withCredentials([usernameColonPassword(credentialsId: env.NEXUS_CRED, variable: 'NEXUS_CREDENTIALS')]) {
                 sh 'curl -u ${NEXUS_CREDENTIALS} "${env.NEXUS_URL}/repository/${env.NEXUS_REPO_NAME}/com/devopsusach2020/DevOpsUsach2020/0.0.1/DevOpsUsach2020-0.0.1.jar" -O'
             }
         }
