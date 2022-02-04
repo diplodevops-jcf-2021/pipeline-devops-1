@@ -191,7 +191,7 @@ void runCi(String[] stagesToRun) {
             CURRENT_STAGE = stageSonar
             figlet CURRENT_STAGE
             String scannerHome = tool 'sonar-scanner'
-            withSonarQubeEnv('docker-compose-sonarqube') {
+            withSonarQubeEnv( env.SONAR_SERVER_NAME ) {
                 sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=ejemplo-gradle -Dsonar.sources=src -Dsonar.java.binaries=build"
             }
         }

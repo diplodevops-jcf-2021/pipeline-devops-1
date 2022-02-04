@@ -129,7 +129,7 @@ void runCi(String[] stagesToRun) {
         stage(stageSonar) {
             CURRENT_STAGE = stageSonar
             def scannerHome = tool 'sonar-scanner'
-            withSonarQubeEnv('docker-compose-sonarqube') {
+            withSonarQubeEnv( env.SONAR_SERVER_NAME ) {
                 sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=ejemplo-maven -Dsonar.sources=src -Dsonar.java.binaries=build"
             }
         }
