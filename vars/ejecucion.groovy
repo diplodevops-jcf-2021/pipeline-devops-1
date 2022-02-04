@@ -3,8 +3,6 @@ void call( String buildTool = "maven" ) {
         agent any
         environment {
             CURRENT_STAGE = ''
-            NEXUS_INSTANCE_ID = 'nexus3-docker'
-            NEXUS_REPOSITORY = 'test-repo'
         }
 
         parameters {
