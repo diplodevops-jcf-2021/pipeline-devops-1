@@ -1,19 +1,19 @@
 
-void call(String[] stagesToRun, String pipelineType) {
+void call(String pipelineType) {
 
     figlet 'Gradle'
     figlet pipelineType
 
-    if (pipelineType == 'CI') {
-        runCi(stagesToRun)
+    if (pipelineType.contains('CI-')) {
+        runCi()
     } else if (pipelineType == 'CD') {
-        runCd(stagesToRun)
+        runCd()
     } else {
         throw new Exception('PipelineType Inválido: ' + pipelineType)
     }
 }
 
-void runCd(String[] stagesToRun) {
+void runCd() {
     String gitDiff         = "gitDiff"
     String nexusDownload   = 'nexusDownload'
     String run             = "run"
@@ -22,7 +22,8 @@ void runCd(String[] stagesToRun) {
     String gitMergeDevelop = 'gitMergeDevelop'
     String gitTagMaster    = 'gitTagMaster'
 
-    String[] stages = [
+ 
+        String[] stages = [
         gitDiff,
         nexusDownload,
         run,
@@ -34,11 +35,7 @@ void runCd(String[] stagesToRun) {
 
     String[] currentStages = []
 
-    if (stagesToRun.size() == 1 && stagesToRun[0] == '') {
         currentStages = stages
-    } else {
-        currentStages = stagesToRun
-    }
 
     if (stages.findAll { e -> currentStages.contains( e ) }.size() == 0) {
         throw new Exception('Al menos una stage es inválida. Stages válidas: ' + stages.join(', ') + '. Recibe: ' + currentStages.join(', '))
@@ -120,30 +117,36 @@ void runCd(String[] stagesToRun) {
     }
 }
 
-void runCi(String[] stagesToRun) {
+void runCi(pipelineType) {
     String stageCompile  = 'compile'
     String stageUnitTest = 'unitTest'
     String stageJar      = 'jar'
     String stageSonar    = 'sonar'
     String stageNexus    = 'nexusUpload'
     String stageRelease  = 'gitCreateRelease'
+    String[] stages = []
 
-    String[] stages = [
-        stageCompile,
-        stageUnitTest,
-        stageJar,
-        stageSonar,
-        stageNexus,
-        stageRelease
-    ]
-
-    String[] currentStages = []
-
-    if (stagesToRun.size() == 1 && stagesToRun[0] == '') {
-        currentStages = stages
-    } else {
-        currentStages = stagesToRun
+    if (pipelineType == 'CI-Feature'){
+        stages = [
+            stageCompile,
+            stageUnitTest,
+            stageJar,
+            stageSonar,
+            stageNexus
+        ]
+    }else if (pipelineType == 'CI-Develop')
+    {
+        stages = [
+            stageCompile,
+            stageUnitTest,
+            stageJar,
+            stageSonar,
+            stageNexus,
+            stageRelease
+        ]
     }
+  
+    String[] currentStages = stages
 
     if (stages.findAll { e -> currentStages.contains( e ) }.size() == 0) {
         throw new Exception('Al menos una stage es inválida. Stages válidas: ' + stages.join(', ') + '. Recibe: ' + currentStages.join(', '))
@@ -166,7 +169,7 @@ void runCi(String[] stagesToRun) {
             sh './gradlew test'
         }
     }
-    
+   
     // jar
     if (currentStages.contains(stageJar)) {
         stage(stageJar) {
@@ -175,7 +178,6 @@ void runCi(String[] stagesToRun) {
             sh './gradlew assemble'
         }
     }
-
 
     // sonar
     if (currentStages.contains(stageSonar)) {

@@ -4,18 +4,20 @@ void call( String buildTool = "maven" ) {
         environment {
             CURRENT_STAGE = ''
         }
-
+// Para el Lab este parametro se debe identitificar por la rama
+/*
         parameters {
             string defaultValue: '', description: 'Stages a ejecutar', name: 'stage'
         }
+*/
         stages {
             stage('pipeline') {
                 steps {
                     script {
                         if (buildTool == 'maven') {
-                            maven.call(getStepsToRun(), getPipelineType())
+                            maven.call(getPipelineType())
                         } else {
-                            gradle.call(getStepsToRun(), getPipelineType())
+                            gradle.call(getPipelineType())
                         }
                     }
                 }
@@ -26,23 +28,25 @@ void call( String buildTool = "maven" ) {
                 slackSend(color: '#00FF00', message: '[gamboa][' + env.JOB_NAME + '][' + buildTool + '] Ejecución Exitosa.')
             }
             failure {
-                slackSend(color: '#FF0000', message: '[gamboa][' + env.JOB_NAME + '][' + buildTool + '] Ejecución Fallida en Stage [' + CURRENT_STAGE + '].')
+                slackSend(color: '#FF0000', message: '[gamboa][' + env.JOB_NAME + '][' + buildTool + '] Ejecución Fallida en Stage [' + env.CURRENT_STAGE + '].')
             }
         }
     }
 }
 
+/*
 String[] getStepsToRun() {
     String[] stepsToRun = params.stage.split(';')
     return stepsToRun
 }
-
+*/
 String getPipelineType() {
-    if (env.GIT_BRANCH.contains('feature-') || env.GIT_BRANCH.contains('develop')) {
-        return 'CI'
-    } else {
+    if (env.GIT_BRANCH.contains('feature-'))
+        return 'CI-Feature'
+    else if (env.GIT_BRANCH.equals('develop'))
+        return 'CI-Develop'
+    else if (env.GIT_BRANCH.contains('release-'))
         return 'CD'
-    }
 }
 
 return this
