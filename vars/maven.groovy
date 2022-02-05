@@ -114,32 +114,32 @@ void runCd() {
     }
 }
 
-
 void runCi(String pipelineType) {
-    String stageBuild = 'compile'
-    String stageTest = 'unitTest'
-    String stageSonar = 'sonar'
-    String stageRun = 'runJar'
-    String stageTestRun = 'rest'
-    String stageNexus = 'nexusCI'
+    String stageCompile  = 'compile'
+    String stageUnitTest = 'unitTest'
+    String stageJar      = 'jar'
+    String stageSonar    = 'sonar'
+    String stageNexus    = 'nexusUpload'
+    String stageRelease  = 'gitCreateRelease'
     String[] stages = []
-
+    
     if (pipelineType == 'CI-Feature'){
         stages = [
-            stageBuild,
-            stageTest,
-            stageRun,
+            stageCompile,
+            stageUnitTest,
+            stageJar,
             stageSonar,
             stageNexus
-       ]
-    }else if (pipelineType == 'CI-Develop'){
+        ]
+    }else if (pipelineType == 'CI-Develop')
+    {
         stages = [
-            stageBuild,
-            stageTest,
-            stageRun,
+            stageCompile,
+            stageUnitTest,
+            stageJar,
             stageSonar,
-            stageNexus
-            // stageCreateRelease  ****Falta implementar Stage
+            stageNexus,
+            stageRelease
         ]
     }
     
@@ -149,65 +149,75 @@ void runCi(String pipelineType) {
         throw new Exception('Al menos una stage es inválida. Stages válidas: ' + stages.join(', ') + '. Recibe: ' + currentStages.join(', '))
     }
 
-    if (currentStages.contains(stageBuild)) {
-        stage(stageBuild) {
-            CURRENT_STAGE = stageBuild
+    // compile
+    if (currentStages.contains(stageCompile)) {
+        stage(stageCompile) {
+            CURRENT_STAGE = stageCompile
+            figlet CURRENT_STAGE
             sh './mvnw clean compile -e'
         }
     }
 
-    if (currentStages.contains(stageTest)) {
-        stage(stageTest) {
-            CURRENT_STAGE = stageTest
+    // unitTest
+    if (currentStages.contains(stageUnitTest)) {
+        stage(stageUnitTest) {
+            CURRENT_STAGE = stageUnitTest
+            figlet CURRENT_STAGE
             sh './mvnw clean test -e'
+        }
+    }
+    
+    // jar
+    if (currentStages.contains(stageJar)) {
+        stage(stageJar) {
+            CURRENT_STAGE = stageJar
+            figlet CURRENT_STAGE
             sh './mvnw clean package -e'
         }
     }
 
-    if (currentStages.contains(stageRun)) {
-        stage(stageRun) {
-            CURRENT_STAGE = stageRun
-            sh './mvnw spring-boot:run &'
-            sleep 20
-        }
-    }
-
+    // sonar
     if (currentStages.contains(stageSonar)) {
         stage(stageSonar) {
             CURRENT_STAGE = stageSonar
-            def scannerHome = tool 'sonar-scanner'
+            figlet CURRENT_STAGE
+            String scannerHome = tool 'sonar-scanner'
             withSonarQubeEnv( env.SONAR_SERVER_NAME ) {
-                sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=ejemplo-maven -Dsonar.sources=src -Dsonar.java.binaries=build"
+                sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=ejemplo-mave -Dsonar.sources=src -Dsonar.java.binaries=build"
             }
         }
     }
 
-    if (currentStages.contains(stageTestRun)) {
-        stage(stageTestRun) {
-            CURRENT_STAGE = stageTestRun
-            sh 'curl -X GET http://localhost:8081/rest/mscovid/test?msg=testing'
-        }
-    }
-
+    // nexusUpload
     if (currentStages.contains(stageNexus)) {
         stage(stageNexus) {
             CURRENT_STAGE = stageNexus
+            figlet CURRENT_STAGE
             nexusPublisher nexusInstanceId: env.NEXUS_INSTANCE_ID,
             nexusRepositoryId: env.NEXUS_REPO_NAME,
-        packages: [
-            [
-                $class: 'MavenPackage',
-                mavenAssetList: [
-                    [classifier: '', extension: '', filePath: 'build/DevOpsUsach2020-0.0.1.jar']
-                ],
-                mavenCoordinate: [
-                    artifactId: 'DevOpsUsach2020',
-                    groupId: 'com.devopsusach2020',
-                    packaging: 'jar',
-                    version: '0.0.1'
+            packages: [
+                [
+                    $class: 'MavenPackage',
+                    mavenAssetList: [
+                        [classifier: '', extension: '', filePath: 'build/DevOpsUsach2020-0.0.1.jar']
+                    ],
+                    mavenCoordinate: [
+                        artifactId: 'DevOpsUsach2020',
+                        groupId: 'com.devopsusach2020',
+                        packaging: 'jar',
+                        version: '0.0.1'
+                    ]
                 ]
             ]
-        ]
+        }
+    }
+    
+    // gitCreateRelease
+    if (currentStages.contains(stageRelease)) {
+        stage(stageRelease) {
+            CURRENT_STAGE = stageRelease
+            figlet CURRENT_STAGE
+            // TODO: definir stage
         }
     }
 }

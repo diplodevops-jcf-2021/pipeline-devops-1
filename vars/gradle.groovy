@@ -117,53 +117,69 @@ void runCd() {
     }
 }
 
-void runCi() {
-    String stageBuild = 'buildAndTest'
-    String stageSonar = 'sonar'
-    String stageRun = 'runJar'
-    String stageTestRun = 'rest'
-    String stageNexus = 'nexusCI'
+void runCi(pipelineType) {
+    String stageCompile  = 'compile'
+    String stageUnitTest = 'unitTest'
+    String stageJar      = 'jar'
+    String stageSonar    = 'sonar'
+    String stageNexus    = 'nexusUpload'
+    String stageRelease  = 'gitCreateRelease'
     String[] stages = []
 
     if (pipelineType == 'CI-Feature'){
         stages = [
-            stageBuild,
-            stageRun,
+            stageCompile,
+            stageUnitTest,
+            stageJar,
             stageSonar,
             stageNexus
         ]
     }else if (pipelineType == 'CI-Develop')
     {
         stages = [
-            stageBuild,
-            stageRun,
+            stageCompile,
+            stageUnitTest,
+            stageJar,
             stageSonar,
-            stageNexus
-        // stageCreateRelease  ****Falta implementar Stage
+            stageNexus,
+            stageRelease
         ]
     }
-
+  
     String[] currentStages = stages
- 
+
     if (stages.findAll { e -> currentStages.contains( e ) }.size() == 0) {
         throw new Exception('Al menos una stage es inválida. Stages válidas: ' + stages.join(', ') + '. Recibe: ' + currentStages.join(', '))
     }
 
-    if (currentStages.contains(stageBuild)) {
-        stage(stageBuild) {
-            CURRENT_STAGE = stageBuild
+    // compile
+    if (currentStages.contains(stageCompile)) {
+        stage(stageCompile) {
+            CURRENT_STAGE = stageCompile
             figlet CURRENT_STAGE
-            sh './gradlew clean build'
+            sh './gradlew clean compileJava compileTestJava'
         }
     }
-    if (currentStages.contains(stageRun)) {
-        stage(stageRun) {
-            CURRENT_STAGE = stageRun
+
+    // unitTest
+    if (currentStages.contains(stageUnitTest)) {
+        stage(stageUnitTest) {
+            CURRENT_STAGE = stageUnitTest
             figlet CURRENT_STAGE
-            sh './gradlew bootRun &'
-            sleep 20
+            sh './gradlew test'
         }
     }
+   
+    // jar
+    if (currentStages.contains(stageJar)) {
+        stage(stageJar) {
+            CURRENT_STAGE = stageJar
+            figlet CURRENT_STAGE
+            sh './gradlew assemble'
+        }
+    }
+
+    // sonar
     if (currentStages.contains(stageSonar)) {
         stage(stageSonar) {
             CURRENT_STAGE = stageSonar
@@ -175,14 +191,7 @@ void runCi() {
         }
     }
 
-    if (currentStages.contains(stageTestRun)) {
-        stage(stageTestRun) {
-            CURRENT_STAGE = stageTestRun
-            figlet CURRENT_STAGE
-            sh 'curl -X GET http://localhost:8081/rest/mscovid/test?msg=testing'
-        }
-    }
-
+    // nexusUpload
     if (currentStages.contains(stageNexus)) {
         stage(stageNexus) {
             CURRENT_STAGE = stageNexus
@@ -203,6 +212,15 @@ void runCi() {
                     ]
                 ]
             ]
+        }
+    }
+    
+    // gitCreateRelease
+    if (currentStages.contains(stageRelease)) {
+        stage(stageRelease) {
+            CURRENT_STAGE = stageRelease
+            figlet CURRENT_STAGE
+            // TODO: definir stage
         }
     }
 }
