@@ -5,7 +5,7 @@ void call(String pipelineType) {
     figlet pipelineType
 
     if (pipelineType.contains('CI-')) {
-        runCi()
+        runCi(pipelineType)
     } else if (pipelineType == 'CD') {
         runCd()
     } else {
