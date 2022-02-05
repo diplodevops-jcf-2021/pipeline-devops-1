@@ -154,7 +154,7 @@ void runCi(String[] stagesToRun) {
         stage(stageCompile) {
             CURRENT_STAGE = stageCompile
             figlet CURRENT_STAGE
-            sh './gradlew compileJava compileTestJava'
+            sh './gradlew clean compileJava compileTestJava'
         }
     }
 
