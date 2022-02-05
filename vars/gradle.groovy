@@ -117,7 +117,7 @@ void runCd() {
     }
 }
 
-void runCi(pipelineType) {
+void runCi(String pipelineType) {
     String stageCompile  = 'compile'
     String stageUnitTest = 'unitTest'
     String stageJar      = 'jar'
