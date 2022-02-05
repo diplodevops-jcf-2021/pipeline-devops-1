@@ -6,7 +6,7 @@ void call(String pipelineType) {
     if (pipelineType.contains('CI-')) {
         runCi(pipelineType)
     } else if (pipelineType == 'CD') {
-        runCd(pipelineType)
+        runCd()
     } else {
         throw new Exception('PipelineType Inválido: ' + pipelineType)
     }
