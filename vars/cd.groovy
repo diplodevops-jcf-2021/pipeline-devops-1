@@ -41,8 +41,9 @@ void call() {
         stage(nexusDownload) {
             CURRENT_STAGE = nexusDownload
             figlet CURRENT_STAGE
+            String repoUrl = "${env.NEXUS_URL}/repository/${env.NEXUS_REPOSITORY_ID}/com/devopsusach2020/DevOpsUsach2020/0.0.1/DevOpsUsach2020-0.0.1.jar";
             withCredentials([usernameColonPassword(credentialsId: env.NEXUS_CREDENTIALS_ID, variable: 'NEXUS_CREDENTIALS')]) {
-                sh 'curl -u ${NEXUS_CREDENTIALS} "${env.NEXUS_URL}/repository/${env.NEXUS_REPOSITORY_ID}/com/devopsusach2020/DevOpsUsach2020/0.0.1/DevOpsUsach2020-0.0.1.jar" -O'
+                sh 'curl -u ${NEXUS_CREDENTIALS} "${repoUrl}" -O'
             }
         }
     }
