@@ -14,6 +14,7 @@ void call(String pipelineType) {
 }
 
 void runCd() {
+
     String gitDiff         = "gitDiff"
     String nexusDownload   = 'nexusDownload'
     String run             = "run"
@@ -21,9 +22,8 @@ void runCd() {
     String gitMergeMaster  = 'gitMergeMaster'
     String gitMergeDevelop = 'gitMergeDevelop'
     String gitTagMaster    = 'gitTagMaster'
-
  
-        String[] stages = [
+    String[] stages = [
         gitDiff,
         nexusDownload,
         run,
@@ -34,8 +34,7 @@ void runCd() {
     ]
 
     String[] currentStages = []
-
-        currentStages = stages
+    currentStages = stages
 
     if (stages.findAll { e -> currentStages.contains( e ) }.size() == 0) {
         throw new Exception('Al menos una stage es inválida. Stages válidas: ' + stages.join(', ') + '. Recibe: ' + currentStages.join(', '))
@@ -46,7 +45,9 @@ void runCd() {
         stage(gitDiff) {
             CURRENT_STAGE = gitDiff
             figlet CURRENT_STAGE
-            // TODO: definir stage
+            sh "git config --add remote.origin.fetch +refs/heads/main:refs/remotes/origin/main"
+            sh "git fetch --no-tags"
+            sh " git diff origin/main origin/${env:BRANCH_NAME}"
         }
     }
 
@@ -60,7 +61,7 @@ void runCd() {
             }
         }
     }
-    
+
     // run
     if (currentStages.contains(run)) {
         stage(run) {
@@ -85,11 +86,9 @@ void runCd() {
         stage(gitMergeMaster) {
             CURRENT_STAGE = gitMergeMaster
             figlet CURRENT_STAGE
-            // TODO: definir stage
-            // def git = new helpers.Git()
-            // git.merge("${env.GIT_LOCAL_BRANCH}",'main')
-            // println "${env.STAGE_NAME} realizado con exito"
-
+            def git = new helpers.Git()
+            git.merge("${env.GIT_LOCAL_BRANCH}",'main')
+            println "${env.STAGE_NAME} realizado con exito"
         }
     }
     
@@ -98,10 +97,9 @@ void runCd() {
         stage(gitMergeDevelop) {
             CURRENT_STAGE = gitMergeDevelop
             figlet CURRENT_STAGE
-            // TODO: definir stage
-            // def git = new helpers.Git()
-            // git.merge("${env.GIT_LOCAL_BRANCH}",'develop')
-            // println "${env.STAGE_NAME} realizado con exito"
+            def git = new helpers.Git()
+            git.merge("${env.GIT_LOCAL_BRANCH}", 'develop')
+            println "${env.STAGE_NAME} realizado con exito"
         }
     }
     
@@ -110,14 +108,15 @@ void runCd() {
         stage(gitTagMaster) {
             CURRENT_STAGE = gitTagMaster
             figlet CURRENT_STAGE
-            // TODO: definir stage
-            // git.tag(env.GIT_LOCAL_BRANCH)
-            // println "${env.STAGE_NAME} realizado con exito"
+            def git = new helpers.Git()
+            git.tag("${env.GIT_LOCAL_BRANCH}")
+            println "${env.STAGE_NAME} realizado con exito"
         }
     }
 }
 
 void runCi(String pipelineType) {
+
     String stageCompile  = 'compile'
     String stageUnitTest = 'unitTest'
     String stageJar      = 'jar'
@@ -126,7 +125,7 @@ void runCi(String pipelineType) {
     String stageRelease  = 'gitCreateRelease'
     String[] stages = []
 
-    if (pipelineType == 'CI-Feature'){
+    if (pipelineType == 'CI-Feature') {
         stages = [
             stageCompile,
             stageUnitTest,
@@ -134,8 +133,7 @@ void runCi(String pipelineType) {
             stageSonar,
             stageNexus
         ]
-    }else if (pipelineType == 'CI-Develop')
-    {
+    } else if (pipelineType == 'CI-Develop') {
         stages = [
             stageCompile,
             stageUnitTest,
@@ -220,7 +218,9 @@ void runCi(String pipelineType) {
         stage(stageRelease) {
             CURRENT_STAGE = stageRelease
             figlet CURRENT_STAGE
-            // TODO: definir stage
+            def git = new helpers.Git()
+            // TODO: solicitar version del release y validarla 
+            git.release("release-v1-0-0")
         }
     }
 }
