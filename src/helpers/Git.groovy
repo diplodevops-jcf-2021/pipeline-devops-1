@@ -2,7 +2,7 @@ package helpers
 
 def merge(String ramaOrigen, String ramaDestino) {
 
-    withCredentials([gitUsernamePassword(credentialsId: 'jenkins-gh-ganvoa', gitToolName: 'Default')]) {
+    withCredentials([gitUsernamePassword(credentialsId: env.GITHUB_CREDENTIALS_ID, gitToolName: 'Default')]) {
         sh "git fetch --all"
 
         checkout(ramaOrigen)
@@ -17,7 +17,12 @@ def merge(String ramaOrigen, String ramaDestino) {
 }
 
 def tag(String rama) {
-
+    withCredentials([gitUsernamePassword(credentialsId: env.GITHUB_CREDENTIALS_ID, gitToolName: 'Default')]){
+        sh "git fetch --all"
+        checkout(rama)
+        sh "git tag -a v1.4"
+        sh "git push origin --tags"
+    }
 }
 
 def checkout(String rama) {
@@ -25,11 +30,9 @@ def checkout(String rama) {
 }
 
 def release(String rama) {
-    withCredentials([gitUsernamePassword(credentialsId: 'girhub-credentials-pass',
-                 gitToolName: 'default')]){
-                         sh "git reset --hard HEAD; git checkout -b ${rama}; git push origin ${rama}"
-                 }
-
+    withCredentials([gitUsernamePassword(credentialsId: env.GITHUB_CREDENTIALS_ID, gitToolName: 'Default')]){
+        sh "git reset --hard HEAD; git checkout -b ${rama}; git push origin ${rama}"
+    }
 }
 
 return this
