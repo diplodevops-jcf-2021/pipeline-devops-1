@@ -1,15 +1,10 @@
-void call( String buildTool = "maven" ) {
+
+void call(String buildTool = 'maven') {
     pipeline {
         agent any
         environment {
             CURRENT_STAGE = ''
         }
-// Para el Lab este parametro se debe identitificar por la rama
-/*
-        parameters {
-            string defaultValue: '', description: 'Stages a ejecutar', name: 'stage'
-        }
-*/
         stages {
             stage('pipeline') {
                 steps {
@@ -34,12 +29,10 @@ void call( String buildTool = "maven" ) {
     }
 }
 
-/*
-String[] getStepsToRun() {
-    String[] stepsToRun = params.stage.split(';')
-    return stepsToRun
+String getBuildTool() {
+    return '';
 }
-*/
+
 String getPipelineType() {
     if (env.GIT_BRANCH.contains('feature-'))
         return 'CI-Feature'
