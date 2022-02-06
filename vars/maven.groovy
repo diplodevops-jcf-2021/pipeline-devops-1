@@ -184,7 +184,7 @@ void runCi(String pipelineType) {
             CURRENT_STAGE = stageSonar
             figlet CURRENT_STAGE
             String scannerHome = tool 'sonar-scanner'
-            withSonarQubeEnv( env.SONAR_QUBE_NAME ) {
+            withSonarQubeEnv( env.SONAR_QUBE_ID ) {
                 sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=ejemplo-mave -Dsonar.sources=src -Dsonar.java.binaries=build"
             }
         }
