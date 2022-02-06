@@ -182,7 +182,7 @@ void runCi(String pipelineType) {
         stage(stageSonar) {
             CURRENT_STAGE = stageSonar
             figlet CURRENT_STAGE
-            String sonarProjectKey = 'ms-iclab-' + ${env.GIT_LOCAL_BRANCH}
+            String sonarProjectKey = "ms-iclab-${env.GIT_LOCAL_BRANCH}"
             String scannerHome = tool 'sonar-scanner'
             withSonarQubeEnv( env.SONAR_QUBE_ID ) {
                 sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=${sonarProjectKey} -Dsonar.sources=src -Dsonar.java.binaries=build"

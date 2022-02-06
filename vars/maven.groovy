@@ -181,7 +181,7 @@ void runCi(String pipelineType) {
     if (currentStages.contains(stageSonar)) {
         stage(stageSonar) {
             CURRENT_STAGE = stageSonar
-            String sonarProjectKey = 'ms-iclab-' + ${env.GIT_LOCAL_BRANCH}
+            String sonarProjectKey = "ms-iclab-${env.GIT_LOCAL_BRANCH}"
             figlet CURRENT_STAGE
             String scannerHome = tool 'sonar-scanner'
             withSonarQubeEnv( env.SONAR_QUBE_ID ) {
