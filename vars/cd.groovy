@@ -43,7 +43,8 @@ void call() {
             figlet CURRENT_STAGE
             withCredentials([usernameColonPassword(credentialsId: env.NEXUS_CREDENTIALS_ID, variable: 'NEXUS_CREDENTIALS')]) {
                 String repoUrl = "${env.NEXUS_URL}/repository/${env.NEXUS_REPOSITORY_ID}/com/devopsusach2020/DevOpsUsach2020/0.0.1/DevOpsUsach2020-0.0.1.jar";
-                sh 'curl -u ${NEXUS_CREDENTIALS} "${repoUrl}" -O'
+                println repoUrl
+                sh 'curl -u ${NEXUS_CREDENTIALS} "' + repoUrl + '" -O'
             }
         }
     }
