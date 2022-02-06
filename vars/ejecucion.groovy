@@ -1,3 +1,4 @@
+
 void call(String buildTool = 'maven') {
     pipeline {
         agent any
