@@ -2,7 +2,7 @@ void call(String pipelineType) {
 
     figlet 'Maven'
     figlet pipelineType
-    
+
     if (pipelineType.contains('CI-')) {
         runCi(pipelineType)
     } else if (pipelineType == 'CD') {
@@ -115,12 +115,14 @@ void runCd() {
 }
 
 void runCi(String pipelineType) {
+
     String stageCompile  = 'compile'
     String stageUnitTest = 'unitTest'
     String stageJar      = 'jar'
     String stageSonar    = 'sonar'
     String stageNexus    = 'nexusUpload'
-    String stageRelease  = 'gitCreateRelease'
+    String stageCreateRelease  = 'gitCreateRelease'
+
     String[] stages = []
     
     if (pipelineType == 'CI-Feature'){
@@ -139,7 +141,7 @@ void runCi(String pipelineType) {
             stageJar,
             stageSonar,
             stageNexus,
-            stageRelease
+            stageCreateRelease
         ]
     }
     
@@ -188,6 +190,14 @@ void runCi(String pipelineType) {
         }
     }
 
+
+    if (currentStages.contains(stageTestRun)) {
+        stage(stageTestRun) {
+            CURRENT_STAGE = stageTestRun
+            sh 'curl -X GET http://localhost:8081/rest/mscovid/test?msg=testing'
+        }
+    }
+
     // nexusUpload
     if (currentStages.contains(stageNexus)) {
         stage(stageNexus) {
@@ -213,11 +223,15 @@ void runCi(String pipelineType) {
     }
     
     // gitCreateRelease
-    if (currentStages.contains(stageRelease)) {
-        stage(stageRelease) {
-            CURRENT_STAGE = stageRelease
+
+        if (currentStages.contains(stageCreateRelease)) {
+        stage(stageCreateRelease) {
+            CURRENT_STAGE = stageCreateRelease
             figlet CURRENT_STAGE
             // TODO: definir stage
+            def git = new helpers.Git()
+            git.release("release-v1.1.4")
+             println "${env.STAGE_NAME} realizado con exito"
         }
     }
 }
