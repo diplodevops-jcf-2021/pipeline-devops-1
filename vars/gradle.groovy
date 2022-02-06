@@ -56,8 +56,8 @@ void runCd() {
         stage(nexusDownload) {
             CURRENT_STAGE = nexusDownload
             figlet CURRENT_STAGE
-            withCredentials([usernameColonPassword(credentialsId: env.NEXUS_CRED, variable: 'NEXUS_CREDENTIALS')]) {
-                sh 'curl -u ${NEXUS_CREDENTIALS} "${env.NEXUS_URL}/repository/${env.NEXUS_REPO_NAME}/com/devopsusach2020/DevOpsUsach2020/0.0.1/DevOpsUsach2020-0.0.1.jar" -O'
+            withCredentials([usernameColonPassword(credentialsId: env.NEXUS_CREDENTIALS_ID, variable: 'NEXUS_CREDENTIALS')]) {
+                sh 'curl -u ${NEXUS_CREDENTIALS} "${env.NEXUS_URL}/repository/${env.NEXUS_REPOSITORY_ID}/com/devopsusach2020/DevOpsUsach2020/0.0.1/DevOpsUsach2020-0.0.1.jar" -O'
             }
         }
     }
@@ -183,7 +183,7 @@ void runCi(String pipelineType) {
             CURRENT_STAGE = stageSonar
             figlet CURRENT_STAGE
             String scannerHome = tool 'sonar-scanner'
-            withSonarQubeEnv( env.SONAR_SERVER_NAME ) {
+            withSonarQubeEnv( env.SONAR_QUBE_NAME ) {
                 sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=ejemplo-gradle -Dsonar.sources=src -Dsonar.java.binaries=build"
             }
         }
@@ -195,7 +195,7 @@ void runCi(String pipelineType) {
             CURRENT_STAGE = stageNexus
             figlet CURRENT_STAGE
             nexusPublisher nexusInstanceId: env.NEXUS_INSTANCE_ID,
-            nexusRepositoryId: env.NEXUS_REPO_NAME,
+            nexusRepositoryId: env.NEXUS_REPOSITORY_ID,
             packages: [
                 [
                     $class: 'MavenPackage',
