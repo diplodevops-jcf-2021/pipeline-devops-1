@@ -20,8 +20,6 @@ def tag(String rama) {
         sh "git fetch --all"
         checkout(rama)
         sh """
-            git config user.name '${}'
-            git config user.email 'my-ci-user@users.noreply.github.example.com'
             git tag -a ${rama} -m "add release ${rama}"
             git push origin --tags
         """
