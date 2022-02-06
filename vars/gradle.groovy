@@ -122,7 +122,7 @@ void runCi(String pipelineType) {
     String stageJar      = 'jar'
     String stageSonar    = 'sonar'
     String stageNexus    = 'nexusUpload'
-    String stageRelease  = 'gitCreateRelease'
+    String stageCreateRelease  = 'gitCreateRelease'
     String[] stages = []
 
     if (pipelineType == 'CI-Feature') {
@@ -140,7 +140,7 @@ void runCi(String pipelineType) {
             stageJar,
             stageSonar,
             stageNexus,
-            stageRelease
+            stageCreateRelease
         ]
     }
   
@@ -182,9 +182,10 @@ void runCi(String pipelineType) {
         stage(stageSonar) {
             CURRENT_STAGE = stageSonar
             figlet CURRENT_STAGE
+            String sonarProjectKey = 'ms-iclab-' + ${env.GIT_LOCAL_BRANCH}
             String scannerHome = tool 'sonar-scanner'
             withSonarQubeEnv( env.SONAR_QUBE_ID ) {
-                sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=ejemplo-gradle -Dsonar.sources=src -Dsonar.java.binaries=build"
+                sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=${sonarProjectKey} -Dsonar.sources=src -Dsonar.java.binaries=build"
             }
         }
     }
@@ -214,13 +215,14 @@ void runCi(String pipelineType) {
     }
     
     // gitCreateRelease
-    if (currentStages.contains(stageRelease)) {
-        stage(stageRelease) {
-            CURRENT_STAGE = stageRelease
+    if (currentStages.contains(stageCreateRelease)) {
+        stage(stageCreateRelease) {
+            CURRENT_STAGE = stageCreateRelease
             figlet CURRENT_STAGE
+            // TODO: definir stage
             def git = new helpers.Git()
-            // TODO: solicitar version del release y validarla 
-            git.release("release-v1-0-0")
+            git.release("release-v1-1-0")
+            println "${env.STAGE_NAME} realizado con exito"
         }
     }
 }

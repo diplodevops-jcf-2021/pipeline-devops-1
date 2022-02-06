@@ -13,6 +13,7 @@ void call(String pipelineType) {
 }
 
 void runCd() {
+
     String gitDiff         = "gitDiff"
     String nexusDownload   = 'nexusDownload'
     String run             = "run"
@@ -32,8 +33,7 @@ void runCd() {
     ]
 
     String[] currentStages = []
-
-        currentStages = stages
+    currentStages = stages
 
     if (stages.findAll { e -> currentStages.contains( e ) }.size() == 0) {
         throw new Exception('Al menos una stage es inválida. Stages válidas: ' + stages.join(', ') + '. Recibe: ' + currentStages.join(', '))
@@ -44,7 +44,9 @@ void runCd() {
         stage(gitDiff) {
             CURRENT_STAGE = gitDiff
             figlet CURRENT_STAGE
-            // TODO: definir stage
+            sh "git config --add remote.origin.fetch +refs/heads/main:refs/remotes/origin/main"
+            sh "git fetch --no-tags"
+            sh " git diff origin/main origin/${env:BRANCH_NAME}"
         }
     }
 
@@ -58,7 +60,7 @@ void runCd() {
             }
         }
     }
-    
+
     // run
     if (currentStages.contains(run)) {
         stage(run) {
@@ -68,7 +70,7 @@ void runCd() {
             sleep 20
         }
     }
-    
+
     // test
     if (currentStages.contains(test)) {
         stage(test) {
@@ -82,11 +84,10 @@ void runCd() {
     if (currentStages.contains(gitMergeMaster)) {
         stage(gitMergeMaster) {
             CURRENT_STAGE = gitMergeMaster
-            figlet CURRENT_STAGE
-            // TODO: definir stage
-            // def git = new helpers.Git()
-            // git.merge("${env.GIT_LOCAL_BRANCH}",'main')
-            // println "${env.STAGE_NAME} realizado con exito"
+            figlet CURRENT_STAGE            
+            def git = new helpers.Git()
+            git.merge("${env.GIT_LOCAL_BRANCH}",'main')
+            println "${env.STAGE_NAME} realizado con exito"
         }
     }
     
@@ -95,10 +96,9 @@ void runCd() {
         stage(gitMergeDevelop) {
             CURRENT_STAGE = gitMergeDevelop
             figlet CURRENT_STAGE
-            // TODO: definir stage
-            // def git = new helpers.Git()
-            // git.merge("${env.GIT_LOCAL_BRANCH}",'develop')
-            // println "${env.STAGE_NAME} realizado con exito"
+            def git = new helpers.Git()
+            git.merge("${env.GIT_LOCAL_BRANCH}", 'develop')
+            println "${env.STAGE_NAME} realizado con exito"
         }
     }
     
@@ -107,9 +107,9 @@ void runCd() {
         stage(gitTagMaster) {
             CURRENT_STAGE = gitTagMaster
             figlet CURRENT_STAGE
-            // TODO: definir stage
-            // git.tag(env.GIT_LOCAL_BRANCH)
-            // println "${env.STAGE_NAME} realizado con exito"
+            def git = new helpers.Git()
+            git.tag("${env.GIT_LOCAL_BRANCH}")
+            println "${env.STAGE_NAME} realizado con exito"
         }
     }
 }
@@ -124,8 +124,8 @@ void runCi(String pipelineType) {
     String stageCreateRelease  = 'gitCreateRelease'
 
     String[] stages = []
-    
-    if (pipelineType == 'CI-Feature'){
+
+    if (pipelineType == 'CI-Feature') {
         stages = [
             stageCompile,
             stageUnitTest,
@@ -133,8 +133,7 @@ void runCi(String pipelineType) {
             stageSonar,
             stageNexus
         ]
-    }else if (pipelineType == 'CI-Develop')
-    {
+    } else if (pipelineType == 'CI-Develop') {
         stages = [
             stageCompile,
             stageUnitTest,
@@ -182,19 +181,12 @@ void runCi(String pipelineType) {
     if (currentStages.contains(stageSonar)) {
         stage(stageSonar) {
             CURRENT_STAGE = stageSonar
+            String sonarProjectKey = 'ms-iclab-' + ${env.GIT_LOCAL_BRANCH}
             figlet CURRENT_STAGE
             String scannerHome = tool 'sonar-scanner'
             withSonarQubeEnv( env.SONAR_QUBE_ID ) {
-                sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=ejemplo-mave -Dsonar.sources=src -Dsonar.java.binaries=build"
+                sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=${sonarProjectKey} -Dsonar.sources=src -Dsonar.java.binaries=build"
             }
-        }
-    }
-
-
-    if (currentStages.contains(stageTestRun)) {
-        stage(stageTestRun) {
-            CURRENT_STAGE = stageTestRun
-            sh 'curl -X GET http://localhost:8081/rest/mscovid/test?msg=testing'
         }
     }
 
@@ -223,15 +215,14 @@ void runCi(String pipelineType) {
     }
     
     // gitCreateRelease
-
-        if (currentStages.contains(stageCreateRelease)) {
+    if (currentStages.contains(stageCreateRelease)) {
         stage(stageCreateRelease) {
             CURRENT_STAGE = stageCreateRelease
             figlet CURRENT_STAGE
             // TODO: definir stage
             def git = new helpers.Git()
-            git.release("release-v1.1.4")
-             println "${env.STAGE_NAME} realizado con exito"
+            git.release("release-v1-1-0")
+            println "${env.STAGE_NAME} realizado con exito"
         }
     }
 }
