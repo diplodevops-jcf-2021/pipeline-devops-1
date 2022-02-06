@@ -32,7 +32,7 @@ void call() {
             figlet CURRENT_STAGE
             sh "git config --add remote.origin.fetch +refs/heads/main:refs/remotes/origin/main"
             sh "git fetch --no-tags"
-            sh " git diff origin/main origin/${GIT_LOCAL_BRANCH}"
+            sh "git diff origin/main origin/${GIT_LOCAL_BRANCH}"
         }
     }
 
