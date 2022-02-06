@@ -9,6 +9,10 @@ void call(String buildTool = 'maven') {
             stage('pipeline') {
                 steps {
                     script {
+
+                        // Validar formato de nombre de rama release
+                        getReleaseVersion()
+
                         if (buildTool == 'maven') {
                             maven.call(getPipelineType())
                         } else {
@@ -33,6 +37,20 @@ void call(String buildTool = 'maven') {
 
 String getBuildTool() {
     return '';
+}
+
+// Obtención de versión en formato "v#-#-#" de rama release
+// si no viene en formato definido lanza error
+String getReleaseVersion(){
+    if (env.GIT_BRANCH.contains('release')){
+        version = ( env.GIT_BRANCH =~ /release-(v\d+\-\d+\-\d+)/)
+        if(version.find()){
+            return version.group(1)
+        }
+        else{
+            throw new Exception('Formato rama release inválido: ' + env.GIT_BRANCH )
+        }
+    }
 }
 
 String getPipelineType() {
