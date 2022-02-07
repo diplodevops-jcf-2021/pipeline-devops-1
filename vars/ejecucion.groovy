@@ -42,9 +42,9 @@ String getPipeline() {
     String pipelineType = getPipelineType()
     String pipeline = ''
     if (pipelineType.contains('CI')) {
-        String pipeline = 'IC'
+        pipeline = 'IC'
     } else if (pipelineType.contains('CD')) {
-        String pipeline = 'Release'
+        pipeline = 'Release'
     }
 
     return pipeline
