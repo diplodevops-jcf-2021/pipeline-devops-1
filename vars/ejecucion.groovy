@@ -16,7 +16,7 @@ void call(String buildTool = 'maven') {
                     script {
 
                         String pipelineType = getPipelineType()
-                        PIPELINE = getPipeline()
+                        PIPELINE = getPipeline(pipelineType)
 
                         if (buildTool == 'maven') {
                             maven.call(pipelineType)
@@ -38,8 +38,7 @@ void call(String buildTool = 'maven') {
     }
 }
 
-String getPipeline() {
-    String pipelineType = getPipelineType()
+String getPipeline(String pipelineType) {
     String pipeline = ''
     if (pipelineType.contains('CI')) {
         pipeline = 'IC'
@@ -52,7 +51,7 @@ String getPipeline() {
 
 // Si no cumple con el patrón de ninguna de las 3 opciones, lanzará error
 String getPipelineType(){
-    if (env.GIT_LOCAL_BRANCH ==~ /^release-v(\d+)-(\d+)-(\d+)$/){
+    if (env.GIT_LOCAL_BRANCH ==~ /^release-v(\d+)-(\d+)-(\d+)$/) {
         return 'CD'
     } else if (env.GIT_LOCAL_BRANCH ==~ /^develop$/) {
         return 'CI-Develop'
