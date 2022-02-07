@@ -27,13 +27,27 @@ void call(String buildTool = 'maven') {
         }
         post {
             success {
-                slackSend color: 'good', message: "[Secc2-Grp4][Pipeline: ${buildTool}][Rama: ${env.BRANCH_NAME}][Stage:${CURRENT_STAGE}] Ejecucion exitosa."
+                String pipeline = getPipeline()
+                slackSend color: 'good', message: "[Grupo4][Pipeline ${pipeline}][Rama: ${env.GIT_LOCAL_BRANCH}][Stage:${CURRENT_STAGE}][Resultado: Ok]"
             }
             failure {
-                slackSend color: 'danger', message: "[Secc2-Grp4][Pipeline: ${buildTool}][Rama: ${env.BRANCH_NAME}] Ejecucion fallida en stage [${CURRENT_STAGE}]."
+                String pipeline = getPipeline()
+                slackSend color: 'danger', message: "[Grupo4][Pipeline ${pipeline}][Rama: ${env.GIT_LOCAL_BRANCH}][Stage:${CURRENT_STAGE}][Resultado: No Ok]."
             }
         }
     }
+}
+
+String getPipeline() {
+    String pipelineType = getPipelineType()
+    String pipeline = ''
+    if (pipelineType.contains('CI')) {
+        String pipeline = 'IC'
+    } else if (pipelineType.contains('CD')) {
+        String pipeline = 'Release'
+    }
+
+    return pipeline
 }
 
 // Si no cumple con el patrón de ninguna de las 3 opciones, lanzará error
