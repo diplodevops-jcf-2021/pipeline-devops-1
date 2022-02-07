@@ -15,7 +15,6 @@ void call(String buildTool = 'maven') {
                     script {
 
                         // Validar formato de nombre de rama release
-                        getReleaseVersion()
 
                         if (buildTool == 'maven') {
                             maven.call(getPipelineType())
