@@ -93,10 +93,9 @@ void runCi(String pipelineType) {
     if (currentStages.contains(stageNexus)) {
         stage(stageNexus) {
 
-            env.ARTIFACT_ID = readMavenPom().getArtifactId()
-            env.ARTIFACT_GROUP_ID = readMavenPom().getGroupId()
-            env.ARTIFACT_VERSION = readMavenPom().getVersion()
-            env.ARTIFACT_NAME = readMavenPom().getName()
+            env.ARTIFACT_GROUP_ID  = sh script: 'mvn help:evaluate -Dexpression=project.groupId -q -DforceStdout', returnStdout: true
+            env.ARTIFACT_ID  = sh script: 'mvn help:evaluate -Dexpression=project.artifactId -q -DforceStdout', returnStdout: true
+            env.ARTIFACT_VERSION  = sh script: 'mvn help:evaluate -Dexpression=project.version -q -DforceStdout', returnStdout: true
 
             CURRENT_STAGE = stageNexus
             figlet CURRENT_STAGE

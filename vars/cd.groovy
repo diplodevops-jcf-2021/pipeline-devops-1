@@ -39,10 +39,15 @@ void call() {
     // nexusDownload
     if (currentStages.contains(nexusDownload)) {
         stage(nexusDownload) {
+
+            env.ARTIFACT_GROUP_ID  = sh script: 'mvn help:evaluate -Dexpression=project.groupId -q -DforceStdout', returnStdout: true
+            env.ARTIFACT_ID  = sh script: 'mvn help:evaluate -Dexpression=project.artifactId -q -DforceStdout', returnStdout: true
+            env.ARTIFACT_VERSION  = sh script: 'mvn help:evaluate -Dexpression=project.version -q -DforceStdout', returnStdout: true
+
             CURRENT_STAGE = nexusDownload
             figlet CURRENT_STAGE
             withCredentials([usernameColonPassword(credentialsId: env.NEXUS_CREDENTIALS_ID, variable: 'NEXUS_CREDENTIALS')]) {
-                String repoUrl = "${env.NEXUS_URL}/repository/${env.NEXUS_REPOSITORY_ID}/${ARTIFACT_GROUP_ID}/${ARTIFACT_ID}/${ARTIFACT_VERSION}/${ARTIFACT_ID}-${ARTIFACT_VERSION}.jar";
+                String repoUrl = "${env.NEXUS_URL}/repository/${env.NEXUS_REPOSITORY_ID}/${env.ARTIFACT_GROUP_ID}/${env.ARTIFACT_ID}/${env.ARTIFACT_VERSION}/${env.ARTIFACT_ID}-${env.ARTIFACT_VERSION}.jar";
                 println repoUrl
                 sh 'curl -u ${NEXUS_CREDENTIALS} "' + repoUrl + '" -O'
             }
@@ -52,9 +57,12 @@ void call() {
     // run
     if (currentStages.contains(run)) {
         stage(run) {
+            env.ARTIFACT_GROUP_ID  = sh script: 'mvn help:evaluate -Dexpression=project.groupId -q -DforceStdout', returnStdout: true
+            env.ARTIFACT_ID  = sh script: 'mvn help:evaluate -Dexpression=project.artifactId -q -DforceStdout', returnStdout: true
+            env.ARTIFACT_VERSION  = sh script: 'mvn help:evaluate -Dexpression=project.version -q -DforceStdout', returnStdout: true
             CURRENT_STAGE = run
             figlet CURRENT_STAGE
-            sh "java -jar ${ARTIFACT_ID}-${ARTIFACT_VERSION}.jar &"
+            sh "java -jar ${env.ARTIFACT_ID}-${env.ARTIFACT_VERSION}.jar &"
             sleep 20
         }
     }
