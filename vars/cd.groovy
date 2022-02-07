@@ -28,7 +28,7 @@ void call() {
     // gitDiff
     if (currentStages.contains(gitDiff)) {
         stage(gitDiff) {
-            CURRENT_STAGE = gitDiff
+            env.CURRENT_STAGE = gitDiff
             figlet CURRENT_STAGE
             sh "git config --add remote.origin.fetch +refs/heads/main:refs/remotes/origin/main"
             sh "git fetch --no-tags"
@@ -46,7 +46,7 @@ void call() {
 
             ARTIFACT_GROUP_ID = ARTIFACT_GROUP_ID.replace(".", "/")
 
-            CURRENT_STAGE = nexusDownload
+            env.CURRENT_STAGE = nexusDownload
             figlet CURRENT_STAGE
             withCredentials([usernameColonPassword(credentialsId: env.NEXUS_CREDENTIALS_ID, variable: 'NEXUS_CREDENTIALS')]) {
                 String repoUrl = "${env.NEXUS_URL}/repository/${env.NEXUS_REPOSITORY_ID}/${ARTIFACT_GROUP_ID}/${ARTIFACT_ID}/${ARTIFACT_VERSION}/${ARTIFACT_ID}-${ARTIFACT_VERSION}.jar";
@@ -59,7 +59,7 @@ void call() {
     // run
     if (currentStages.contains(run)) {
         stage(run) {
-            CURRENT_STAGE = run
+            env.CURRENT_STAGE = run
             figlet CURRENT_STAGE
             sh "java -jar app.jar &"
             sleep 20
@@ -69,7 +69,7 @@ void call() {
     // test
     if (currentStages.contains(test)) {
         stage(test) {
-            CURRENT_STAGE = test
+            env.CURRENT_STAGE = test
             figlet CURRENT_STAGE
             sh 'curl -X GET http://localhost:8081/rest/mscovid/test?msg=testing'
         }
@@ -78,7 +78,7 @@ void call() {
     // gitMergeMaster
     if (currentStages.contains(gitMergeMaster)) {
         stage(gitMergeMaster) {
-            CURRENT_STAGE = gitMergeMaster
+            env.CURRENT_STAGE = gitMergeMaster
             figlet CURRENT_STAGE
             def git = new helpers.Git()
             git.merge("${env.GIT_LOCAL_BRANCH}",'main')
@@ -89,7 +89,7 @@ void call() {
     // gitMergeDevelop
     if (currentStages.contains(gitMergeDevelop)) {
         stage(gitMergeDevelop) {
-            CURRENT_STAGE = gitMergeDevelop
+            env.CURRENT_STAGE = gitMergeDevelop
             figlet CURRENT_STAGE
             def git = new helpers.Git()
             git.merge("${env.GIT_LOCAL_BRANCH}", 'develop')
@@ -100,7 +100,7 @@ void call() {
     // gitTagMaster
     if (currentStages.contains(gitTagMaster)) {
         stage(gitTagMaster) {
-            CURRENT_STAGE = gitTagMaster
+            env.CURRENT_STAGE = gitTagMaster
             figlet CURRENT_STAGE
             def git = new helpers.Git()
             git.tag("${env.GIT_LOCAL_BRANCH}")
