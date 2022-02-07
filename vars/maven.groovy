@@ -52,7 +52,7 @@ void runCi(String pipelineType) {
     // compile
     if (currentStages.contains(stageCompile)) {
         stage(stageCompile) {
-            CURRENT_STAGE = stageCompile
+            env.CURRENT_STAGE = stageCompile
             figlet CURRENT_STAGE
             sh './mvnw clean compile -e'
         }
@@ -61,7 +61,7 @@ void runCi(String pipelineType) {
     // unitTest
     if (currentStages.contains(stageUnitTest)) {
         stage(stageUnitTest) {
-            CURRENT_STAGE = stageUnitTest
+            env.CURRENT_STAGE = stageUnitTest
             figlet CURRENT_STAGE
             sh './mvnw clean test -e'
         }
@@ -70,7 +70,7 @@ void runCi(String pipelineType) {
     // jar
     if (currentStages.contains(stageJar)) {
         stage(stageJar) {
-            CURRENT_STAGE = stageJar
+            env.CURRENT_STAGE = stageJar
             figlet CURRENT_STAGE
             sh './mvnw clean package -e'
         }
@@ -79,9 +79,9 @@ void runCi(String pipelineType) {
     // sonar
     if (currentStages.contains(stageSonar)) {
         stage(stageSonar) {
-            CURRENT_STAGE = stageSonar
-            String sonarProjectKey = "ms-iclab-${env.GIT_LOCAL_BRANCH}"
+            env.CURRENT_STAGE = stageSonar
             figlet CURRENT_STAGE
+            String sonarProjectKey = "ms-iclab-${env.GIT_LOCAL_BRANCH}"
             String scannerHome = tool 'sonar-scanner'
             withSonarQubeEnv( env.SONAR_QUBE_ID ) {
                 sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=${sonarProjectKey} -Dsonar.sources=src -Dsonar.java.binaries=build"
@@ -92,36 +92,60 @@ void runCi(String pipelineType) {
     // nexusUpload
     if (currentStages.contains(stageNexus)) {
         stage(stageNexus) {
-            CURRENT_STAGE = stageNexus
+
+            env.CURRENT_STAGE = stageNexus
             figlet CURRENT_STAGE
+
+            String ARTIFACT_GROUP_ID  = sh script: './mvnw help:evaluate -Dexpression=project.groupId -q -DforceStdout', returnStdout: true
+            String ARTIFACT_ID  = sh script: './mvnw help:evaluate -Dexpression=project.artifactId -q -DforceStdout', returnStdout: true
+            String ARTIFACT_VERSION  = sh script: './mvnw help:evaluate -Dexpression=project.version -q -DforceStdout', returnStdout: true
+
             nexusPublisher nexusInstanceId: env.NEXUS_INSTANCE_ID,
             nexusRepositoryId: env.NEXUS_REPOSITORY_ID,
             packages: [
                 [
                     $class: 'MavenPackage',
                     mavenAssetList: [
-                        [classifier: '', extension: '', filePath: 'build/DevOpsUsach2020-0.0.1.jar']
+                        [classifier: '', extension: '', filePath: "build/${ARTIFACT_ID}-${ARTIFACT_VERSION}.jar"]
                     ],
                     mavenCoordinate: [
-                        artifactId: 'DevOpsUsach2020',
-                        groupId: 'com.devopsusach2020',
+                        artifactId: ARTIFACT_ID,
+                        groupId: ARTIFACT_GROUP_ID,
                         packaging: 'jar',
-                        version: '0.0.1'
+                        version: ARTIFACT_VERSION
                     ]
                 ]
             ]
         }
     }
-    
+
     // gitCreateRelease
     if (currentStages.contains(stageCreateRelease)) {
+
+        env.RELEASE_VERSION = input (
+            message: 'Generar Release?', 
+            ok: 'Si', 
+            parameters: [
+                string(
+                    defaultValue: 'v1-0-0', 
+                    description: 'Release a crear. (Ej: v1-0-0)', 
+                    name: 'RELEASE_VERSION', 
+                    trim: true
+                )
+            ]
+        )
+
+        println "se creará la release ${env.RELEASE_VERSION}"
+
         stage(stageCreateRelease) {
-            CURRENT_STAGE = stageCreateRelease
+            env.CURRENT_STAGE = stageCreateRelease
             figlet CURRENT_STAGE
-            // TODO: definir stage
             def git = new helpers.Git()
-            git.release("release-v1-1-0")
-            println "${env.STAGE_NAME} realizado con exito"
+            if (env.RELEASE_VERSION ==~ /^v(\d+)-(\d+)-(\d+)$/) {
+                git.release("release-${env.RELEASE_VERSION}")
+            } else {
+                throw new Exception('Formato release inválido: ' + env.RELEASE_VERSION)
+            }
         }
     }
 }

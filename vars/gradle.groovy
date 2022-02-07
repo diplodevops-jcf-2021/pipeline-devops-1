@@ -50,7 +50,7 @@ void runCi(String pipelineType) {
     // compile
     if (currentStages.contains(stageCompile)) {
         stage(stageCompile) {
-            CURRENT_STAGE = stageCompile
+            env.CURRENT_STAGE = stageCompile
             figlet CURRENT_STAGE
             sh './gradlew clean compileJava compileTestJava'
         }
@@ -59,7 +59,7 @@ void runCi(String pipelineType) {
     // unitTest
     if (currentStages.contains(stageUnitTest)) {
         stage(stageUnitTest) {
-            CURRENT_STAGE = stageUnitTest
+            env.CURRENT_STAGE = stageUnitTest
             figlet CURRENT_STAGE
             sh './gradlew test'
         }
@@ -68,7 +68,7 @@ void runCi(String pipelineType) {
     // jar
     if (currentStages.contains(stageJar)) {
         stage(stageJar) {
-            CURRENT_STAGE = stageJar
+            env.CURRENT_STAGE = stageJar
             figlet CURRENT_STAGE
             sh './gradlew assemble'
         }
@@ -77,7 +77,7 @@ void runCi(String pipelineType) {
     // sonar
     if (currentStages.contains(stageSonar)) {
         stage(stageSonar) {
-            CURRENT_STAGE = stageSonar
+            env.CURRENT_STAGE = stageSonar
             figlet CURRENT_STAGE
             String sonarProjectKey = "ms-iclab-${env.GIT_LOCAL_BRANCH}"
             String scannerHome = tool 'sonar-scanner'
@@ -90,7 +90,7 @@ void runCi(String pipelineType) {
     // nexusUpload
     if (currentStages.contains(stageNexus)) {
         stage(stageNexus) {
-            CURRENT_STAGE = stageNexus
+            env.CURRENT_STAGE = stageNexus
             figlet CURRENT_STAGE
             nexusPublisher nexusInstanceId: env.NEXUS_INSTANCE_ID,
             nexusRepositoryId: env.NEXUS_REPOSITORY_ID,
@@ -114,7 +114,7 @@ void runCi(String pipelineType) {
     // gitCreateRelease
     if (currentStages.contains(stageCreateRelease)) {
         stage(stageCreateRelease) {
-            CURRENT_STAGE = stageCreateRelease
+            env.CURRENT_STAGE = stageCreateRelease
             figlet CURRENT_STAGE
             // TODO: definir stage
             def git = new helpers.Git()
