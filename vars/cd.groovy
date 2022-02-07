@@ -28,8 +28,8 @@ void call() {
     // gitDiff
     if (currentStages.contains(gitDiff)) {
         stage(gitDiff) {
-            env.CURRENT_STAGE = gitDiff
-            figlet env.CURRENT_STAGE
+            CURRENT_STAGE = gitDiff
+            figlet CURRENT_STAGE
             sh "git config --add remote.origin.fetch +refs/heads/main:refs/remotes/origin/main"
             sh "git fetch --no-tags"
             sh "git diff origin/main origin/${GIT_LOCAL_BRANCH}"
@@ -39,10 +39,10 @@ void call() {
     // nexusDownload
     if (currentStages.contains(nexusDownload)) {
         stage(nexusDownload) {
-            env.CURRENT_STAGE = nexusDownload
-            figlet env.CURRENT_STAGE
+            CURRENT_STAGE = nexusDownload
+            figlet CURRENT_STAGE
             withCredentials([usernameColonPassword(credentialsId: env.NEXUS_CREDENTIALS_ID, variable: 'NEXUS_CREDENTIALS')]) {
-                String repoUrl = "${env.NEXUS_URL}/repository/${env.NEXUS_REPOSITORY_ID}/${env.ARTIFACT_GROUP_ID}/${env.ARTIFACT_ID}/${env.ARTIFACT_VERSION}/${env.ARTIFACT_ID}-${env.ARTIFACT_VERSION}.jar";
+                String repoUrl = "${env.NEXUS_URL}/repository/${env.NEXUS_REPOSITORY_ID}/${ARTIFACT_GROUP_ID}/${ARTIFACT_ID}/${ARTIFACT_VERSION}/${ARTIFACT_ID}-${ARTIFACT_VERSION}.jar";
                 println repoUrl
                 sh 'curl -u ${NEXUS_CREDENTIALS} "' + repoUrl + '" -O'
             }
@@ -52,9 +52,9 @@ void call() {
     // run
     if (currentStages.contains(run)) {
         stage(run) {
-            env.CURRENT_STAGE = run
-            figlet env.CURRENT_STAGE
-            sh "java -jar ${env.ARTIFACT_ID}-${env.ARTIFACT_VERSION}.jar &"
+            CURRENT_STAGE = run
+            figlet CURRENT_STAGE
+            sh "java -jar ${ARTIFACT_ID}-${ARTIFACT_VERSION}.jar &"
             sleep 20
         }
     }
@@ -62,8 +62,8 @@ void call() {
     // test
     if (currentStages.contains(test)) {
         stage(test) {
-            env.CURRENT_STAGE = test
-            figlet env.CURRENT_STAGE
+            CURRENT_STAGE = test
+            figlet CURRENT_STAGE
             sh 'curl -X GET http://localhost:8081/rest/mscovid/test?msg=testing'
         }
     }
@@ -71,8 +71,8 @@ void call() {
     // gitMergeMaster
     if (currentStages.contains(gitMergeMaster)) {
         stage(gitMergeMaster) {
-            env.CURRENT_STAGE = gitMergeMaster
-            figlet env.CURRENT_STAGE
+            CURRENT_STAGE = gitMergeMaster
+            figlet CURRENT_STAGE
             def git = new helpers.Git()
             git.merge("${env.GIT_LOCAL_BRANCH}",'main')
             println "${env.STAGE_NAME} realizado con exito"
@@ -82,8 +82,8 @@ void call() {
     // gitMergeDevelop
     if (currentStages.contains(gitMergeDevelop)) {
         stage(gitMergeDevelop) {
-            env.CURRENT_STAGE = gitMergeDevelop
-            figlet env.CURRENT_STAGE
+            CURRENT_STAGE = gitMergeDevelop
+            figlet CURRENT_STAGE
             def git = new helpers.Git()
             git.merge("${env.GIT_LOCAL_BRANCH}", 'develop')
             println "${env.STAGE_NAME} realizado con exito"
@@ -93,8 +93,8 @@ void call() {
     // gitTagMaster
     if (currentStages.contains(gitTagMaster)) {
         stage(gitTagMaster) {
-            env.CURRENT_STAGE = gitTagMaster
-            figlet env.CURRENT_STAGE
+            CURRENT_STAGE = gitTagMaster
+            figlet CURRENT_STAGE
             def git = new helpers.Git()
             git.tag("${env.GIT_LOCAL_BRANCH}")
             println "${env.STAGE_NAME} realizado con exito"

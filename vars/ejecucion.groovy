@@ -19,10 +19,10 @@ void call(String buildTool = 'maven') {
 
                         if (buildTool == 'maven') {
 
-                            env.ARTIFACT_ID = readMavenPom().getArtifactId()
-                            env.ARTIFACT_GROUP_ID = readMavenPom().getGroupId()
-                            env.ARTIFACT_VERSION = readMavenPom().getVersion()
-                            env.ARTIFACT_NAME = readMavenPom().getName()
+                            ARTIFACT_ID = readMavenPom().getArtifactId()
+                            ARTIFACT_GROUP_ID = readMavenPom().getGroupId()
+                            ARTIFACT_VERSION = readMavenPom().getVersion()
+                            ARTIFACT_NAME = readMavenPom().getName()
 
                             maven.call(getPipelineType())
                         } else {
@@ -34,19 +34,13 @@ void call(String buildTool = 'maven') {
         }
         post {
             success {
-                //slackSend(color: '#00FF00', message: '[gamboa][' + env.JOB_NAME + '][' + buildTool + '] Ejecución Exitosa.')
-                slackSend color: 'good', message: "[Secc2-Grp4][Pipeline: ${env.buildTool}][Rama: ${env.BRANCH_NAME}][Stage:${env.CURRENT_STAGE}] Ejecucion exitosa."
+                slackSend color: 'good', message: "[Secc2-Grp4][Pipeline: ${buildTool}][Rama: ${env.BRANCH_NAME}][Stage:${CURRENT_STAGE}] Ejecucion exitosa."
             }
             failure {
-                //slackSend(color: '#FF0000', message: '[gamboa][' + env.JOB_NAME + '][' + buildTool + '] Ejecución Fallida en Stage [' + env.CURRENT_STAGE + '].')
-                slackSend color: 'danger', message: "[Secc2-Grp4][Pipeline: ${env.buildTool}][Rama: ${env.BRANCH_NAME}] Ejecucion fallida en stage [${env.CURRENT_STAGE}]."
+                slackSend color: 'danger', message: "[Secc2-Grp4][Pipeline: ${buildTool}][Rama: ${env.BRANCH_NAME}] Ejecucion fallida en stage [${CURRENT_STAGE}]."
             }
         }
     }
-}
-
-String getBuildTool() {
-    return '';
 }
 
 // Obtención de versión en formato "v#-#-#" de rama release
