@@ -126,8 +126,7 @@ void runCi(String pipelineType) {
                     name: 'RELEASE_VERSION', 
                     trim: true
                 )
-            ], 
-            submitterParameter: 'createRelease'
+            ]
         )
 
         println "se creará la release ${env.RELEASE_VERSION}"
