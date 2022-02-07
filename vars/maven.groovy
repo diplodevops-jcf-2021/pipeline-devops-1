@@ -92,6 +92,12 @@ void runCi(String pipelineType) {
     // nexusUpload
     if (currentStages.contains(stageNexus)) {
         stage(stageNexus) {
+
+            env.ARTIFACT_ID = readMavenPom().getArtifactId()
+            env.ARTIFACT_GROUP_ID = readMavenPom().getGroupId()
+            env.ARTIFACT_VERSION = readMavenPom().getVersion()
+            env.ARTIFACT_NAME = readMavenPom().getName()
+
             CURRENT_STAGE = stageNexus
             figlet CURRENT_STAGE
             nexusPublisher nexusInstanceId: env.NEXUS_INSTANCE_ID,
@@ -100,13 +106,13 @@ void runCi(String pipelineType) {
                 [
                     $class: 'MavenPackage',
                     mavenAssetList: [
-                        [classifier: '', extension: '', filePath: "build/${ARTIFACT_ID}-${ARTIFACT_VERSION}.jar"]
+                        [classifier: '', extension: '', filePath: "build/${env.ARTIFACT_ID}-${env.ARTIFACT_VERSION}.jar"]
                     ],
                     mavenCoordinate: [
-                        artifactId: ARTIFACT_ID,
-                        groupId: ARTIFACT_GROUP_ID,
+                        artifactId: env.ARTIFACT_ID,
+                        groupId: env.ARTIFACT_GROUP_ID,
                         packaging: 'jar',
-                        version: ARTIFACT_VERSION
+                        version: env.ARTIFACT_VERSION
                     ]
                 ]
             ]

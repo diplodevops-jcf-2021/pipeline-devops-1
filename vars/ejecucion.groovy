@@ -18,12 +18,6 @@ void call(String buildTool = 'maven') {
                         getReleaseVersion()
 
                         if (buildTool == 'maven') {
-
-                            ARTIFACT_ID = readMavenPom().getArtifactId()
-                            ARTIFACT_GROUP_ID = readMavenPom().getGroupId()
-                            ARTIFACT_VERSION = readMavenPom().getVersion()
-                            ARTIFACT_NAME = readMavenPom().getName()
-
                             maven.call(getPipelineType())
                         } else {
                             gradle.call(getPipelineType())
