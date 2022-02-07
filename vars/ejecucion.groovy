@@ -4,6 +4,7 @@ void call(String buildTool = 'maven') {
         agent any
         environment {
             CURRENT_STAGE = ''
+            PIPELINE = ''
             ARTIFACT_ID = ''
             ARTIFACT_NAME = ''
             ARTIFACT_GROUP_ID = ''
@@ -15,7 +16,8 @@ void call(String buildTool = 'maven') {
                     script {
 
                         String pipelineType = getPipelineType()
-
+                        PIPELINE = getPipeline()
+                        
                         if (buildTool == 'maven') {
                             maven.call(pipelineType)
                         } else {
