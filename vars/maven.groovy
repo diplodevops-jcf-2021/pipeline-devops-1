@@ -80,8 +80,8 @@ void runCi(String pipelineType) {
     if (currentStages.contains(stageSonar)) {
         stage(stageSonar) {
             CURRENT_STAGE = stageSonar
-            String sonarProjectKey = "ms-iclab-${env.GIT_LOCAL_BRANCH}"
             figlet CURRENT_STAGE
+            String sonarProjectKey = "ms-iclab-${env.GIT_LOCAL_BRANCH}"
             String scannerHome = tool 'sonar-scanner'
             withSonarQubeEnv( env.SONAR_QUBE_ID ) {
                 sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=${sonarProjectKey} -Dsonar.sources=src -Dsonar.java.binaries=build"
@@ -93,12 +93,13 @@ void runCi(String pipelineType) {
     if (currentStages.contains(stageNexus)) {
         stage(stageNexus) {
 
+            CURRENT_STAGE = stageNexus
+            figlet CURRENT_STAGE
+
             String ARTIFACT_GROUP_ID  = sh script: './mvnw help:evaluate -Dexpression=project.groupId -q -DforceStdout', returnStdout: true
             String ARTIFACT_ID  = sh script: './mvnw help:evaluate -Dexpression=project.artifactId -q -DforceStdout', returnStdout: true
             String ARTIFACT_VERSION  = sh script: './mvnw help:evaluate -Dexpression=project.version -q -DforceStdout', returnStdout: true
 
-            CURRENT_STAGE = stageNexus
-            figlet CURRENT_STAGE
             nexusPublisher nexusInstanceId: env.NEXUS_INSTANCE_ID,
             nexusRepositoryId: env.NEXUS_REPOSITORY_ID,
             packages: [
@@ -140,8 +141,12 @@ void runCi(String pipelineType) {
             CURRENT_STAGE = stageCreateRelease
             figlet CURRENT_STAGE
             def git = new helpers.Git()
-            git.release("release-${env.RELEASE_VERSION}")
 
+            if (env.RELEASE_VERSION ==~ /^release-v(\d+)-(\d+)-(\d+)$/) {
+                git.release("release-${env.RELEASE_VERSION}")
+            } else {
+                throw new Exception('Formato release inválido: ' + env.RELEASE_VERSION)
+            }
         }
     }
 }

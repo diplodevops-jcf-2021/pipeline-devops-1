@@ -5,10 +5,6 @@ void call(String buildTool = 'maven') {
         environment {
             CURRENT_STAGE = ''
             PIPELINE = ''
-            ARTIFACT_ID = ''
-            ARTIFACT_NAME = ''
-            ARTIFACT_GROUP_ID = ''
-            ARTIFACT_VERSION = ''
         }
         stages {
             stage('pipeline') {
@@ -32,7 +28,7 @@ void call(String buildTool = 'maven') {
                 slackSend color: 'good', message: "[Grupo4][Pipeline ${PIPELINE}][Rama: ${env.GIT_LOCAL_BRANCH}][Stage:${CURRENT_STAGE}][Resultado: Ok]"
             }
             failure {
-                slackSend color: 'danger', message: "[Grupo4][Pipeline ${PIPELINE}][Rama: ${env.GIT_LOCAL_BRANCH}][Stage:${CURRENT_STAGE}][Resultado: No Ok]."
+                slackSend color: 'danger', message: "[Grupo4][Pipeline ${PIPELINE}][Rama: ${env.GIT_LOCAL_BRANCH}][Stage:${CURRENT_STAGE}][Resultado: No Ok]"
             }
         }
     }
