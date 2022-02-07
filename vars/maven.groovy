@@ -116,7 +116,7 @@ void runCi(String pipelineType) {
     // gitCreateRelease
     if (currentStages.contains(stageCreateRelease)) {
 
-        input 
+        input (
             message: 'Generar Release?', 
             ok: 'Si', 
             parameters: [
@@ -128,6 +128,7 @@ void runCi(String pipelineType) {
                 )
             ], 
             submitterParameter: 'createRelease'
+        )
 
         if (params.createRelease) {
             stage(stageCreateRelease) {
