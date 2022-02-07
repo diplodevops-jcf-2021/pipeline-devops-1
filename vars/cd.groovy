@@ -40,9 +40,9 @@ void call() {
     if (currentStages.contains(nexusDownload)) {
         stage(nexusDownload) {
 
-            env.ARTIFACT_GROUP_ID  = sh script: 'mvn help:evaluate -Dexpression=project.groupId -q -DforceStdout', returnStdout: true
-            env.ARTIFACT_ID  = sh script: 'mvn help:evaluate -Dexpression=project.artifactId -q -DforceStdout', returnStdout: true
-            env.ARTIFACT_VERSION  = sh script: 'mvn help:evaluate -Dexpression=project.version -q -DforceStdout', returnStdout: true
+            env.ARTIFACT_GROUP_ID  = sh script: './mvnw help:evaluate -Dexpression=project.groupId -q -DforceStdout', returnStdout: true
+            env.ARTIFACT_ID  = sh script: './mvnw help:evaluate -Dexpression=project.artifactId -q -DforceStdout', returnStdout: true
+            env.ARTIFACT_VERSION  = sh script: './mvnw help:evaluate -Dexpression=project.version -q -DforceStdout', returnStdout: true
 
             CURRENT_STAGE = nexusDownload
             figlet CURRENT_STAGE
@@ -57,9 +57,9 @@ void call() {
     // run
     if (currentStages.contains(run)) {
         stage(run) {
-            env.ARTIFACT_GROUP_ID  = sh script: 'mvn help:evaluate -Dexpression=project.groupId -q -DforceStdout', returnStdout: true
-            env.ARTIFACT_ID  = sh script: 'mvn help:evaluate -Dexpression=project.artifactId -q -DforceStdout', returnStdout: true
-            env.ARTIFACT_VERSION  = sh script: 'mvn help:evaluate -Dexpression=project.version -q -DforceStdout', returnStdout: true
+            env.ARTIFACT_GROUP_ID  = sh script: './mvnw help:evaluate -Dexpression=project.groupId -q -DforceStdout', returnStdout: true
+            env.ARTIFACT_ID  = sh script: './mvnw help:evaluate -Dexpression=project.artifactId -q -DforceStdout', returnStdout: true
+            env.ARTIFACT_VERSION  = sh script: './mvnw help:evaluate -Dexpression=project.version -q -DforceStdout', returnStdout: true
             CURRENT_STAGE = run
             figlet CURRENT_STAGE
             sh "java -jar ${env.ARTIFACT_ID}-${env.ARTIFACT_VERSION}.jar &"
@@ -83,7 +83,7 @@ void call() {
             figlet CURRENT_STAGE
             def git = new helpers.Git()
             git.merge("${env.GIT_LOCAL_BRANCH}",'main')
-            println "${env.STAGE_NAME} realizado con exito"
+            println "${STAGE_NAME} realizado con exito"
         }
     }
     
@@ -94,7 +94,7 @@ void call() {
             figlet CURRENT_STAGE
             def git = new helpers.Git()
             git.merge("${env.GIT_LOCAL_BRANCH}", 'develop')
-            println "${env.STAGE_NAME} realizado con exito"
+            println "${STAGE_NAME} realizado con exito"
         }
     }
     
@@ -105,7 +105,7 @@ void call() {
             figlet CURRENT_STAGE
             def git = new helpers.Git()
             git.tag("${env.GIT_LOCAL_BRANCH}")
-            println "${env.STAGE_NAME} realizado con exito"
+            println "${STAGE_NAME} realizado con exito"
         }
     }
 }
