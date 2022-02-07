@@ -26,12 +26,12 @@ void call(String buildTool = 'maven') {
             }
         }
         post {
-            String pipeline = getPipeline()
-
             success {
+                String pipeline = getPipeline()
                 slackSend color: 'good', message: "[Grupo4][Pipeline ${pipeline}][Rama: ${env.GIT_LOCAL_BRANCH}][Stage:${CURRENT_STAGE}][Resultado: Ok]"
             }
             failure {
+                String pipeline = getPipeline()
                 slackSend color: 'danger', message: "[Grupo4][Pipeline ${pipeline}][Rama: ${env.GIT_LOCAL_BRANCH}][Stage:${CURRENT_STAGE}][Resultado: No Ok]."
             }
         }
