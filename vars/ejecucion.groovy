@@ -4,6 +4,10 @@ void call(String buildTool = 'maven') {
         agent any
         environment {
             CURRENT_STAGE = ''
+            ARTIFACT_ID = ''
+            ARTIFACT_NAME = ''
+            ARTIFACT_GROUP_ID = ''
+            ARTIFACT_VERSION = ''
         }
         stages {
             stage('pipeline') {
@@ -14,6 +18,12 @@ void call(String buildTool = 'maven') {
                         getReleaseVersion()
 
                         if (buildTool == 'maven') {
+
+                            env.ARTIFACT_ID = readMavenPom().getArtifactId()
+                            env.ARTIFACT_GROUP_ID = readMavenPom().getGroupId()
+                            env.ARTIFACT_VERSION = readMavenPom().getVersion()
+                            env.ARTIFACT_NAME = readMavenPom().getName()
+
                             maven.call(getPipelineType())
                         } else {
                             gradle.call(getPipelineType())
@@ -25,11 +35,11 @@ void call(String buildTool = 'maven') {
         post {
             success {
                 //slackSend(color: '#00FF00', message: '[gamboa][' + env.JOB_NAME + '][' + buildTool + '] Ejecución Exitosa.')
-                slackSend color: 'good', message: "[Secc2-Grp4][Pipeline: ${env.buildTool}][Rama: ${env.BRANCH_NAME}][Stage:${CURRENT_STAGE}] Ejecucion exitosa."
+                slackSend color: 'good', message: "[Secc2-Grp4][Pipeline: ${env.buildTool}][Rama: ${env.BRANCH_NAME}][Stage:${env.CURRENT_STAGE}] Ejecucion exitosa."
             }
             failure {
                 //slackSend(color: '#FF0000', message: '[gamboa][' + env.JOB_NAME + '][' + buildTool + '] Ejecución Fallida en Stage [' + env.CURRENT_STAGE + '].')
-                slackSend color: 'danger', message: "[Secc2-Grp4][Pipeline: ${env.buildTool}][Rama: ${env.BRANCH_NAME}] Ejecucion fallida en stage [${CURRENT_STAGE}]."
+                slackSend color: 'danger', message: "[Secc2-Grp4][Pipeline: ${env.buildTool}][Rama: ${env.BRANCH_NAME}] Ejecucion fallida en stage [${env.CURRENT_STAGE}]."
             }
         }
     }

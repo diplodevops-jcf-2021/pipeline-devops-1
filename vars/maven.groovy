@@ -52,8 +52,8 @@ void runCi(String pipelineType) {
     // compile
     if (currentStages.contains(stageCompile)) {
         stage(stageCompile) {
-            CURRENT_STAGE = stageCompile
-            figlet CURRENT_STAGE
+            env.CURRENT_STAGE = stageCompile
+            figlet env.CURRENT_STAGE
             sh './mvnw clean compile -e'
         }
     }
@@ -61,8 +61,8 @@ void runCi(String pipelineType) {
     // unitTest
     if (currentStages.contains(stageUnitTest)) {
         stage(stageUnitTest) {
-            CURRENT_STAGE = stageUnitTest
-            figlet CURRENT_STAGE
+            env.CURRENT_STAGE = stageUnitTest
+            figlet env.CURRENT_STAGE
             sh './mvnw clean test -e'
         }
     }
@@ -70,8 +70,8 @@ void runCi(String pipelineType) {
     // jar
     if (currentStages.contains(stageJar)) {
         stage(stageJar) {
-            CURRENT_STAGE = stageJar
-            figlet CURRENT_STAGE
+            env.CURRENT_STAGE = stageJar
+            figlet env.CURRENT_STAGE
             sh './mvnw clean package -e'
         }
     }
@@ -79,9 +79,9 @@ void runCi(String pipelineType) {
     // sonar
     if (currentStages.contains(stageSonar)) {
         stage(stageSonar) {
-            CURRENT_STAGE = stageSonar
+            env.CURRENT_STAGE = stageSonar
             String sonarProjectKey = "ms-iclab-${env.GIT_LOCAL_BRANCH}"
-            figlet CURRENT_STAGE
+            figlet env.CURRENT_STAGE
             String scannerHome = tool 'sonar-scanner'
             withSonarQubeEnv( env.SONAR_QUBE_ID ) {
                 sh "${scannerHome}/bin/sonar-scanner -Dsonar.projectKey=${sonarProjectKey} -Dsonar.sources=src -Dsonar.java.binaries=build"
@@ -92,21 +92,21 @@ void runCi(String pipelineType) {
     // nexusUpload
     if (currentStages.contains(stageNexus)) {
         stage(stageNexus) {
-            CURRENT_STAGE = stageNexus
-            figlet CURRENT_STAGE
+            env.CURRENT_STAGE = stageNexus
+            figlet env.CURRENT_STAGE
             nexusPublisher nexusInstanceId: env.NEXUS_INSTANCE_ID,
             nexusRepositoryId: env.NEXUS_REPOSITORY_ID,
             packages: [
                 [
                     $class: 'MavenPackage',
                     mavenAssetList: [
-                        [classifier: '', extension: '', filePath: 'build/DevOpsUsach2020-0.0.1.jar']
+                        [classifier: '', extension: '', filePath: "build/${env.ARTIFACT_ID}-${env.ARTIFACT_VERSION}.jar"]
                     ],
                     mavenCoordinate: [
-                        artifactId: 'DevOpsUsach2020',
-                        groupId: 'com.devopsusach2020',
+                        artifactId: env.ARTIFACT_ID,
+                        groupId: env.ARTIFACT_GROUP_ID,
                         packaging: 'jar',
-                        version: '0.0.1'
+                        version: env.ARTIFACT_VERSION
                     ]
                 ]
             ]
@@ -132,8 +132,8 @@ void runCi(String pipelineType) {
         println "se creará la release ${env.RELEASE_VERSION}"
 
         stage(stageCreateRelease) {
-            CURRENT_STAGE = stageCreateRelease
-            figlet CURRENT_STAGE
+            env.CURRENT_STAGE = stageCreateRelease
+            figlet env.CURRENT_STAGE
             def git = new helpers.Git()
             git.release("release-${env.RELEASE_VERSION}")
 
