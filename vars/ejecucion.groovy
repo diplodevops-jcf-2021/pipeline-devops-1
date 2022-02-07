@@ -17,7 +17,7 @@ void call(String buildTool = 'maven') {
                             }
                             slackSend color: 'good', message: "[Grupo4][Pipeline ${env.PIPELINE}][Rama: ${env.GIT_LOCAL_BRANCH}][Stage:${env.CURRENT_STAGE}][Resultado: Ok]"
                         } catch(Exception e) {
-                            println(ex.getMessage());
+                            println(e.getMessage());
                             slackSend color: 'danger', message: "[Grupo4][Pipeline ${env.PIPELINE}][Rama: ${env.GIT_LOCAL_BRANCH}][Stage:${env.CURRENT_STAGE}][Resultado: No Ok]"
                         }
                     }
