@@ -44,6 +44,8 @@ void call() {
             String ARTIFACT_ID  = sh script: './mvnw help:evaluate -Dexpression=project.artifactId -q -DforceStdout', returnStdout: true
             String ARTIFACT_VERSION  = sh script: './mvnw help:evaluate -Dexpression=project.version -q -DforceStdout', returnStdout: true
 
+            ARTIFACT_GROUP_ID = ARTIFACT_GROUP_ID.replace(".", "/")
+
             CURRENT_STAGE = nexusDownload
             figlet CURRENT_STAGE
             withCredentials([usernameColonPassword(credentialsId: env.NEXUS_CREDENTIALS_ID, variable: 'NEXUS_CREDENTIALS')]) {
