@@ -141,7 +141,7 @@ void runCi(String pipelineType) {
             env.CURRENT_STAGE = stageCreateRelease
             figlet CURRENT_STAGE
             def git = new helpers.Git()
-            if (env.RELEASE_VERSION ==~ /^release-v(\d+)-(\d+)-(\d+)$/) {
+            if (env.RELEASE_VERSION ==~ /^v(\d+)-(\d+)-(\d+)$/) {
                 git.release("release-${env.RELEASE_VERSION}")
             } else {
                 throw new Exception('Formato release inválido: ' + env.RELEASE_VERSION)
