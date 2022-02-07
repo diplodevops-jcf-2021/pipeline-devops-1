@@ -2,25 +2,22 @@
 void call(String buildTool = 'maven') {
     pipeline {
         agent any
-        environment {
-            CURRENT_STAGE = ''
-            PIPELINE = ''
-        }
         stages {
             stage('pipeline') {
                 steps {
                     script {
                         String pipelineType = getPipelineType()
-                        PIPELINE = getPipeline(pipelineType)
+                        env.CURRENT_STAGE = ''
+                        env.PIPELINE = getPipeline(pipelineType)
                         try {
                             if (buildTool == 'maven') {
                                 maven.call(pipelineType)
                             } else {
                                 gradle.call(pipelineType)
                             }
-                            slackSend color: 'good', message: "[Grupo4][Pipeline ${PIPELINE}][Rama: ${env.GIT_LOCAL_BRANCH}][Stage:${CURRENT_STAGE}][Resultado: Ok]"
+                            slackSend color: 'good', message: "[Grupo4][Pipeline ${env.PIPELINE}][Rama: ${env.GIT_LOCAL_BRANCH}][Stage:${env.CURRENT_STAGE}][Resultado: Ok]"
                         } catch(Exception e) {
-                            slackSend color: 'danger', message: "[Grupo4][Pipeline ${PIPELINE}][Rama: ${env.GIT_LOCAL_BRANCH}][Stage:${CURRENT_STAGE}][Resultado: No Ok]"
+                            slackSend color: 'danger', message: "[Grupo4][Pipeline ${env.PIPELINE}][Rama: ${env.GIT_LOCAL_BRANCH}][Stage:${env.CURRENT_STAGE}][Resultado: No Ok]"
                         }
                     }
                 }
