@@ -17,7 +17,7 @@ void call(String buildTool = 'maven') {
 
                         String pipelineType = getPipelineType()
                         PIPELINE = getPipeline()
-                        
+
                         if (buildTool == 'maven') {
                             maven.call(pipelineType)
                         } else {
@@ -29,10 +29,10 @@ void call(String buildTool = 'maven') {
         }
         post {
             success {
-                slackSend color: 'good', message: "[Grupo4][Pipeline ${getPipeline()}][Rama: ${env.GIT_LOCAL_BRANCH}][Stage:${CURRENT_STAGE}][Resultado: Ok]"
+                slackSend color: 'good', message: "[Grupo4][Pipeline ${PIPELINE}][Rama: ${env.GIT_LOCAL_BRANCH}][Stage:${CURRENT_STAGE}][Resultado: Ok]"
             }
             failure {
-                slackSend color: 'danger', message: "[Grupo4][Pipeline ${getPipeline()}][Rama: ${env.GIT_LOCAL_BRANCH}][Stage:${CURRENT_STAGE}][Resultado: No Ok]."
+                slackSend color: 'danger', message: "[Grupo4][Pipeline ${PIPELINE}][Rama: ${env.GIT_LOCAL_BRANCH}][Stage:${CURRENT_STAGE}][Resultado: No Ok]."
             }
         }
     }
