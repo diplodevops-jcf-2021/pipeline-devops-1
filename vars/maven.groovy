@@ -93,9 +93,9 @@ void runCi(String pipelineType) {
     if (currentStages.contains(stageNexus)) {
         stage(stageNexus) {
 
-            env.ARTIFACT_GROUP_ID  = sh script: './mvnw help:evaluate -Dexpression=project.groupId -q -DforceStdout', returnStdout: true
-            env.ARTIFACT_ID  = sh script: './mvnw help:evaluate -Dexpression=project.artifactId -q -DforceStdout', returnStdout: true
-            env.ARTIFACT_VERSION  = sh script: './mvnw help:evaluate -Dexpression=project.version -q -DforceStdout', returnStdout: true
+            String ARTIFACT_GROUP_ID  = sh script: './mvnw help:evaluate -Dexpression=project.groupId -q -DforceStdout', returnStdout: true
+            String ARTIFACT_ID  = sh script: './mvnw help:evaluate -Dexpression=project.artifactId -q -DforceStdout', returnStdout: true
+            String ARTIFACT_VERSION  = sh script: './mvnw help:evaluate -Dexpression=project.version -q -DforceStdout', returnStdout: true
 
             CURRENT_STAGE = stageNexus
             figlet CURRENT_STAGE
@@ -105,13 +105,13 @@ void runCi(String pipelineType) {
                 [
                     $class: 'MavenPackage',
                     mavenAssetList: [
-                        [classifier: '', extension: '', filePath: "build/${env.ARTIFACT_ID}-${env.ARTIFACT_VERSION}.jar"]
+                        [classifier: '', extension: '', filePath: "build/${ARTIFACT_ID}-${ARTIFACT_VERSION}.jar"]
                     ],
                     mavenCoordinate: [
-                        artifactId: env.ARTIFACT_ID,
-                        groupId: env.ARTIFACT_GROUP_ID,
+                        artifactId: ARTIFACT_ID,
+                        groupId: ARTIFACT_GROUP_ID,
                         packaging: 'jar',
-                        version: env.ARTIFACT_VERSION
+                        version: ARTIFACT_VERSION
                     ]
                 ]
             ]
