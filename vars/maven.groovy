@@ -119,7 +119,7 @@ void runCi(String pipelineType) {
             message "Generar Release?"
             ok "Si"
             parameters {
-                string(name: 'version', defaultValue: '', description: 'Ingresar Version (ejemplo: v1-1-1)')
+                string defaultValue: '', description: 'Ingresar Version (ejemplo: v1-1-1)', name: 'version'
             }
         }
         stage(stageCreateRelease) {
