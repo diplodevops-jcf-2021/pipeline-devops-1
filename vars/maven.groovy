@@ -116,27 +116,27 @@ void runCi(String pipelineType) {
     // gitCreateRelease
     if (currentStages.contains(stageCreateRelease)) {
 
-        input (
+        env.RELEASE_VERSION = input (
             message: 'Generar Release?', 
             ok: 'Si', 
             parameters: [
                 string(
                     defaultValue: 'v1-0-0', 
                     description: 'Release a crear. (Ej: v1-0-0)', 
-                    name: 'releaseVersion', 
+                    name: 'RELEASE_VERSION', 
                     trim: true
                 )
             ], 
             submitterParameter: 'createRelease'
         )
 
-        println "se creará la release ${params.releaseVersion}"
+        println "se creará la release ${env.RELEASE_VERSION}"
 
         stage(stageCreateRelease) {
             CURRENT_STAGE = stageCreateRelease
             figlet CURRENT_STAGE
             def git = new helpers.Git()
-            git.release("release-${params.releaseVersion}")
+            git.release("release-${env.RELEASE_VERSION}")
 
         }
     }
