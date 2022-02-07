@@ -14,12 +14,12 @@ void call(String buildTool = 'maven') {
                 steps {
                     script {
 
-                        // Validar formato de nombre de rama release
+                        String pipelineType = getPipelineType()
 
                         if (buildTool == 'maven') {
-                            maven.call(getPipelineType())
+                            maven.call(pipelineType)
                         } else {
-                            gradle.call(getPipelineType())
+                            gradle.call(pipelineType)
                         }
                     }
                 }
@@ -36,27 +36,17 @@ void call(String buildTool = 'maven') {
     }
 }
 
-// Obtención de versión en formato "v#-#-#" de rama release
-// si no viene en formato definido lanza error
-String getReleaseVersion(){
-    if (env.GIT_BRANCH.contains('release')){
-        version = ( env.GIT_BRANCH =~ /release-(v\d+\-\d+\-\d+)/)
-        if(version.find()){
-            return version.group(1)
-        }
-        else{
-            throw new Exception('Formato rama release inválido: ' + env.GIT_BRANCH )
-        }
-    }
-}
-
-String getPipelineType() {
-    if (env.GIT_BRANCH.contains('feature-'))
-        return 'CI-Feature'
-    else if (env.GIT_BRANCH.equals('develop'))
-        return 'CI-Develop'
-    else if (env.GIT_BRANCH.contains('release-'))
+// Si no cumple con el patrón de ninguna de las 3 opciones, lanzará error
+String getPipelineType(){
+    if (env.GIT_LOCAL_BRANCH ==~ /^release-v(\d+)-(\d+)-(\d+)$/){
         return 'CD'
+    } else if (env.GIT_LOCAL_BRANCH ==~ /^develop$/) {
+        return 'CI-Develop'
+    } else if (env.GIT_LOCAL_BRANCH ==~ /^feature-(.+)$/)
+        return 'CI-Feature'
+    } else {
+        throw new Exception('Formato rama inválido: ' + env.GIT_LOCAL_BRANCH )
+    }
 }
 
 return this
