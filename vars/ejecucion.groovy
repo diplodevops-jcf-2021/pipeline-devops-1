@@ -38,6 +38,7 @@ String getPipeline(String pipelineType) {
     return pipeline
 }
 
+
 // Si no cumple con el patrón de ninguna de las 3 opciones, lanzará error
 String getPipelineType(){
     if (env.GIT_LOCAL_BRANCH ==~ /^release-v(\d+)-(\d+)-(\d+)$/) {
