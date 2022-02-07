@@ -42,7 +42,7 @@ String getPipelineType(){
         return 'CD'
     } else if (env.GIT_LOCAL_BRANCH ==~ /^develop$/) {
         return 'CI-Develop'
-    } else if (env.GIT_LOCAL_BRANCH ==~ /^feature-(.+)$/)
+    } else if (env.GIT_LOCAL_BRANCH ==~ /^feature-(.+)$/) {
         return 'CI-Feature'
     } else {
         throw new Exception('Formato rama inválido: ' + env.GIT_LOCAL_BRANCH )
