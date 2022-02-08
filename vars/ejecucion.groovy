@@ -6,6 +6,7 @@ void call(String buildTool = 'maven') {
             stage('pipeline') {
                 steps {
                     script {
+                        sh "env"
                         String pipelineType = getPipelineType()
                         env.CURRENT_STAGE = ''
                         env.PIPELINE = getPipeline(pipelineType)
